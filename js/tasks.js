@@ -57,6 +57,20 @@ function renderizarTareas(tarea) {
             </div>
           </li>`;
   }
+
+  const btnsChange = document.querySelectorAll(".change");
+  const btnsBorrar = document.querySelectorAll(".borrar");
+
+  btnsChange.forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      botonesCambioEstado(e.target);
+    });
+  });
+  btnsBorrar.forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      botonBorrarTarea(e.target);
+    });
+  });
 }
 
 // consultar  tareas
@@ -71,7 +85,6 @@ function consultarTareas() {
   fetch(url, config)
     .then((response) => response.json())
     .then((json) => {
-      console.log(json);
       tareasTerminadas.innerHTML = "";
       tareasPendientes.innerHTML = "";
       json.forEach((tarea) => {
@@ -108,6 +121,67 @@ function crearTarea(tarea) {
     });
 }
 
-function botonesCambioEstado() {}
+function consultarTareaPorId(elemento) {
+  const url = `https://todo-api-nest.onrender.com/todos/${elemento.id}`;
+  const tareaActualizar = {
+    title: "",
+    isCompleted: "",
+  };
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  };
+
+  fetch(url, config)
+    .then((response) => response.json())
+    .then((json) => {
+      if (json.isCompleted === true) {
+        tareaActualizar.title = json.title;
+        tareaActualizar.isCompleted = false;
+      } else {
+        tareaActualizar.title = json.title;
+        tareaActualizar.isCompleted = true;
+      }
+    });
+  return tareaActualizar;
+}
+
+function botonesCambioEstado(elemento) {
+  //   console.log(consultarTareaPorId(elemento));
+  const url = `https://todo-api-nest.onrender.com/todos/${elemento.id}`;
+  const config = {
+    method: "PATCH",
+    body: JSON.stringify(consultarTareaPorId(elemento)),
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  };
+
+  fetch(url, config)
+    .then((response) => response.json())
+    .then((json) => {
+      console.log(json);
+    });
+}
+
+function botonBorrarTarea(elemento) {
+  const url = `https://todo-api-nest.onrender.com/todos/${elemento.id}`;
+  const config = {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  };
+
+  fetch(url, config)
+    .then((response) => response.json())
+    .then((json) => {
+      console.log("tarea borrada");
+    });
+}
 
 asiganrNombre();
