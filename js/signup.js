@@ -20,9 +20,9 @@ function validarInputs() {
 }
 
 // validar si hay una sesion activa
-const jwt = localStorage.getItem("tokens");
-if (jwt) {
-  location.replace("tasks.html");
+const sesion = localStorage.getItem("tokens");
+if (sesion) {
+  location.replace("tareas.html");
 }
 
 // agregar evento al formulario
@@ -90,6 +90,7 @@ function realizarRegistro(nuevoUsuario) {
           JSON.stringify({
             accessToken: json.accessToken,
             refreshToken: json.refreshToken,
+            userName: json.user.name,
           })
         );
         location.replace("tareas.html");

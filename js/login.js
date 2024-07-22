@@ -4,9 +4,9 @@ const inputEmail = document.querySelector("#inputEmail");
 const inputPassword = document.querySelector("#inputPassword");
 
 // validar si hay una sesion activa
-const jwt = localStorage.getItem("tokens");
-if (jwt) {
-  location.replace("tasks.html");
+const sesion = localStorage.getItem("tokens");
+if (sesion) {
+  location.replace("tareas.html");
 }
 
 // agregar evento al formulario
@@ -49,6 +49,7 @@ function realizarLogin(usuario) {
           JSON.stringify({
             accessToken: json.accessToken,
             refreshToken: json.refreshToken,
+            userName: json.user.name,
           })
         );
         location.replace("tareas.html");
