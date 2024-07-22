@@ -54,6 +54,11 @@ function renderizarTareas(tarea) {
               <p class="timestamp">${new Date(
                 tarea.createdAt
               ).toLocaleDateString()}</p>
+              <div class="cambios-estados">
+                  <button class="borrar" id="${
+                    tarea.id
+                  }"><i class="fa-regular fa-trash-can"></i></button>
+                </div>
             </div>
           </li>`;
   }
@@ -121,7 +126,7 @@ function crearTarea(tarea) {
     });
 }
 
-function consultarTareaPorId(elemento) {
+async function consultarTareaPorId(elemento) {
   const url = `https://todo-api-nest.onrender.com/todos/${elemento.id}`;
   const tareaActualizar = {
     title: "",
@@ -134,37 +139,33 @@ function consultarTareaPorId(elemento) {
     },
   };
 
-  fetch(url, config)
-    .then((response) => response.json())
-    .then((json) => {
-      if (json.isCompleted === true) {
-        tareaActualizar.title = json.title;
-        tareaActualizar.isCompleted = false;
-      } else {
-        tareaActualizar.title = json.title;
-        tareaActualizar.isCompleted = true;
-      }
-    });
+  const response = await fetch(url, config);
+  const json = await response.json();
+
+  tareaActualizar.title = json.title;
+  tareaActualizar.isCompleted = !json.isCompleted;
+
   return tareaActualizar;
 }
 
 function botonesCambioEstado(elemento) {
-  //   console.log(consultarTareaPorId(elemento));
-  const url = `https://todo-api-nest.onrender.com/todos/${elemento.id}`;
-  const config = {
-    method: "PATCH",
-    body: JSON.stringify(consultarTareaPorId(elemento)),
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  };
+  consultarTareaPorId(elemento).then((tareaActualizar) => {
+    const url = `https://todo-api-nest.onrender.com/todos/${elemento.id}`;
+    const config = {
+      method: "PATCH",
+      body: JSON.stringify(tareaActualizar),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    };
 
-  fetch(url, config)
-    .then((response) => response.json())
-    .then((json) => {
-      console.log(json);
-    });
+    fetch(url, config)
+      .then((response) => response.json())
+      .then((json) => {
+        consultarTareas();
+      });
+  });
 }
 
 function botonBorrarTarea(elemento) {
@@ -180,7 +181,7 @@ function botonBorrarTarea(elemento) {
   fetch(url, config)
     .then((response) => response.json())
     .then((json) => {
-      console.log("tarea borrada");
+      consultarTareas();
     });
 }
 
